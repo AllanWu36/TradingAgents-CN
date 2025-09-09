@@ -326,8 +326,35 @@ def create_news_analyst(llm, toolkit):
                     logger.error(f"[新闻分析师] ❌ 强制补救过程失败: {e}")
                     report = result.content
             else:
-                # 有工具调用，直接使用结果
-                report = result.content
+                # 有工具调用：实际执行统一新闻工具，并基于真实数据进行二次生成
+                try:
+                    logger.info(f"[新闻分析师] 🔧 执行工具调用：get_stock_news_unified（实际调用统一新闻工具函数）")
+                    tool_output = unified_news_tool(stock_code=ticker, max_news=10, model_info=model_info)
+                    if tool_output and len(tool_output.strip()) > 100:
+                        logger.info(f"[新闻分析师] ✅ 工具执行成功，生成基于真实新闻的分析")
+                        followup_prompt = f"""
+您是一位专业的财经新闻分析师。请基于以下最新获取的新闻数据，对股票 {ticker} 进行详细的新闻分析：
+
+=== 最新新闻数据 ===
+{tool_output}
+
+=== 分析要求 ===
+{system_message}
+
+请基于上述真实新闻数据撰写详细的中文分析报告。
+"""
+                        followup_result = llm.invoke([{"role": "user", "content": followup_prompt}])
+                        if hasattr(followup_result, 'content') and followup_result.content:
+                            report = followup_result.content
+                        else:
+                            logger.warning(f"[新闻分析师] ⚠️ 基于工具结果的二次生成失败，回退到原始模型输出")
+                            report = result.content
+                    else:
+                        logger.warning(f"[新闻分析师] ⚠️ 统一新闻工具返回内容过短/为空，回退到原始模型输出")
+                        report = result.content
+                except Exception as e:
+                    logger.error(f"[新闻分析师] ❌ 执行统一新闻工具失败: {e}，回退到原始模型输出")
+                    report = result.content
         
         total_time_taken = (datetime.now() - start_time).total_seconds()
         logger.info(f"[新闻分析师] 新闻分析完成，总耗时: {total_time_taken:.2f}秒")

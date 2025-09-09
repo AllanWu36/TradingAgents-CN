@@ -1025,14 +1025,14 @@ class Toolkit:
                     
                     # 获取东方财富新闻
                     news_df = get_stock_news_em(clean_ticker)
-                    
+                    print(news_df)
                     if not news_df.empty:
                         # 格式化东方财富新闻
                         em_news_items = []
                         for _, row in news_df.iterrows():
-                            news_title = row.get('标题', '')
-                            news_time = row.get('时间', '')
-                            news_url = row.get('链接', '')
+                            news_title = row.get('新闻标题', '')
+                            news_time = row.get('发布时间', '')
+                            news_url = row.get('新闻链接', '')
                             
                             news_item = f"- **{news_title}** [{news_time}]({news_url})"
                             em_news_items.append(news_item)
