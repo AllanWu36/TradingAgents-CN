@@ -576,6 +576,13 @@ class OptimizedChinaDataProvider:
                 indicator_name = row['指标']
                 value = row[latest_col]
                 indicators_dict[indicator_name] = value
+
+                if indicator_name == '基本每股收益':
+                    col2 = main_indicators.columns[3]
+                    col3 = main_indicators.columns[4]
+                    col4 = main_indicators.columns[5]
+                    indicators_dict[indicator_name] = (value + row[col2] + row[col3] + row[col4]) / 2.5
+
             
             logger.debug(f"AKShare主要财务指标数量: {len(indicators_dict)}")
             
