@@ -221,10 +221,13 @@ class OptimizedChinaDataProvider:
         # 然后从股票数据中提取价格信息
         if "股票名称:" in stock_data:
             lines = stock_data.split('\n')
+            logger.info(f"🔍 [股票代码追踪] 从股票数据中提取价格信息: {lines}")
             for line in lines:
                 if "股票名称:" in line and company_name == "未知公司":
                     company_name = line.split(':')[1].strip()
                 elif "当前价格:" in line:
+                    current_price = line.split(':')[1].strip()
+                elif "最新价格:" in line:
                     current_price = line.split(':')[1].strip()
                 elif "涨跌幅:" in line:
                     change_pct = line.split(':')[1].strip()
@@ -235,7 +238,11 @@ class OptimizedChinaDataProvider:
         if current_price == "N/A" and stock_data:
             try:
                 lines = stock_data.split('\n')
+                logger.info(f"🔍 [股票代码追踪] 从股票数据中提取价格信息: {lines}")
+
                 for i, line in enumerate(lines):
+                    if "最新价格:" in line:
+                        current_price = line.split(':')[1].strip()
                     if "最新数据:" in line and i + 1 < len(lines):
                         # 查找数据行
                         for j in range(i + 1, min(i + 5, len(lines))):
@@ -597,7 +604,7 @@ class OptimizedChinaDataProvider:
                         # 计算PE = 股价 / 每股收益
                         pe_val = price_value / eps_val
                         metrics["pe"] = f"{pe_val:.1f}倍"
-                        logger.debug(f"✅ 计算PE: 股价{price_value} / EPS{eps_val} = {metrics['pe']}")
+                        logger.info(f"✅ 计算PE: 股价{price_value} / EPS{eps_val} = {metrics['pe']}")
                     else:
                         metrics["pe"] = "N/A（亏损）"
                 except (ValueError, TypeError):

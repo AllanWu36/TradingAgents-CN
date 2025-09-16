@@ -501,6 +501,7 @@ class DataSourceManager:
                         try:
                             change = float(latest_price) - float(first_price)
                             change_pct = (change / float(first_price)) * 100
+                            result += f"\n\n💰 最新价格: ¥{latest_price:.2f}\n"
                             result += f"\n\n📊 期间统计:\n"
                             result += f"期间涨跌: {change:+.2f} ({change_pct:+.2f}%)\n"
                             result += f"最高价: {data['最高'].max() if '最高' in data.columns else data.get('high', pd.Series()).max():.2f}\n"

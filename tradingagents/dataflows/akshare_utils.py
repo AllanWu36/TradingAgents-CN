@@ -84,7 +84,7 @@ class AKShareProvider:
                 period="daily",
                 start_date=start_date.replace('-', '') if start_date else "20240101",
                 end_date=end_date.replace('-', '') if end_date else "20241231",
-                adjust=""
+                adjust="qfq"
             )
             
             return data
@@ -155,7 +155,7 @@ class AKShareProvider:
                         period="daily",
                         start_date=start_date_formatted,
                         end_date=end_date_formatted,
-                        adjust=""
+                        adjust="qfq"
                     )
                 except Exception as e:
                     exception[0] = e
